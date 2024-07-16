@@ -1,0 +1,45 @@
+name: Render documentation
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+env:
+  FORCE_COLOR: "1"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3"
+    - name: Install graphviz
+      run: |
+        sudo apt-get update
+        sudo apt-get install libopenblas-dev gfortran libgmp-dev libmpfr-dev ccache
+    - name: Update submodules
+      run: |
+        git submodule init
+        git submodule update
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install scipy
+        pip install numpy cython pybind11 pythran ninja meson
+        pip install -r requirements/doc.txt
+        pip install mpmath gmpy2 "asv>=0.6.0" click rich-click doit pydevtool pooch threadpoolctl scipy
+
+    - name: Render the documentation
+      run: cd doc && make SPHINXOPTS="-j1 " html
