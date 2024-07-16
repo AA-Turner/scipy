@@ -38,4 +38,4 @@ jobs:
         pip install mpmath gmpy2 "asv>=0.6.0" click rich-click doit pydevtool pooch threadpoolctl scipy
 
     - name: Render the documentation
-      run: cd doc && make SPHINXOPTS="-j1 " html
+      run: python dev.py --no-build doc 2>&1 | tee sphinx_log.txt
