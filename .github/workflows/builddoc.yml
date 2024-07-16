@@ -39,3 +39,5 @@ jobs:
 
     - name: Render the documentation
       run: python dev.py --no-build doc 2>&1 | tee sphinx_log.txt
+      env:
+        GITVER: 87c4664
